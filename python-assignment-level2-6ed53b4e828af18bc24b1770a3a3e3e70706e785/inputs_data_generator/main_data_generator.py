@@ -25,13 +25,14 @@ if __name__ == "__main__":
                               ["bws"] * 10
 
     gen_id = "starter"
-    output_location = f"../input_data/{gen_id}"
+    output_location = f"./input_data/{gen_id}"
     os.makedirs(output_location, exist_ok=True)
 
     gen_customers = generate_customers(output_location, 137)
     product_id_lookup = generate_products(output_location, products_data)
 
     start_date = datetime(2018, 12, 1, 0, 0, 0)
-    end_date = datetime(2018, 12, 10, 23, 59, 59)
+    end_date = datetime(2019, 5, 31, 23, 59, 59)
     generate_transactions(output_location, gen_customers, products_data, product_id_lookup, products_cats_frequency,
                           start_date, end_date)
+

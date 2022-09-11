@@ -49,7 +49,13 @@ def main():
     customers , products = read_csv(params['customers_location'],params['products_location'])
     transaction = transactions(params['transactions_location'])
     output = return_output(customers, products, transaction)
-    output.to_json(params['output_location']+'output_10_Days.json', orient='records', lines=True)
+    # sort output by customer_id
+    idx = (output.assign(customer_id=output.customer_id.str.extract(r'(\d+)$').astype(int))
+         .sort_values(['customer_id'])
+         .index)
+
+    output = output.iloc[idx]
+    output.to_json(params['output_location']+'output_6_months.json', orient='records', lines=True)
 
 
 
