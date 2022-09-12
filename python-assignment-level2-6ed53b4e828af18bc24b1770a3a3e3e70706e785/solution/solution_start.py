@@ -30,6 +30,8 @@ def read_csv(customers_location, products_location) -> pd.DataFrame:
     return customers, products
 
 def return_output(customers, products, transactions):
+    if not isinstance(customers, pd.DataFrame) or not isinstance(products, pd.DataFrame) or not isinstance(transactions, pd.DataFrame):
+        raise Exception("Input data is not a pandas DataFrame")
     transactions = transactions.groupby(['customer_id','date_of_purchase']).sum().reset_index()
     transactions['purchase_count'] = transactions['basket'].apply(lambda x: len(x))
     transactions = transactions.explode('basket').reset_index(drop=True)
