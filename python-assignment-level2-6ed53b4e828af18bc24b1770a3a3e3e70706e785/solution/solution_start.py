@@ -6,9 +6,9 @@ import glob
 
 def get_params() -> dict:
     parser = argparse.ArgumentParser(description='DataTest')
-    parser.add_argument('--customers_location', required=False, default="./input_data/starter/customers.csv")
-    parser.add_argument('--products_location', required=False, default="./input_data/starter/products.csv")
-    parser.add_argument('--transactions_location', required=False, default= r'.\input_data\starter\transactions/*')
+    parser.add_argument('--customers_location', required=False, default="../input_data/starter/customers.csv")
+    parser.add_argument('--products_location', required=False, default="../input_data/starter/products.csv")
+    parser.add_argument('--transactions_location', required=False, default= r'..\input_data\starter\transactions/*')
     parser.add_argument('--output_location', required=False, default="./output_data/outputs/")
     return vars(parser.parse_args())
 
@@ -44,20 +44,27 @@ def return_output(customers, products, transactions):
     transactions = transactions.rename(columns={'date_of_purchase':'purchase_count'})
     transactions = transactions[['customer_id','loyalty_score','product_id','product_category','purchase_count']]
     return transactions
-    
 
-def main():
-    params = get_params()
-    customers , products = read_csv(params['customers_location'],params['products_location'])
-    transaction = transactions(params['transactions_location'])
-    output = return_output(customers, products, transaction)
+
+def sort_output(output):
     # sort output by customer_id
     idx = (output.assign(customer_id=output.customer_id.str.extract(r'(\d+)$').astype(int))
          .sort_values(['customer_id'])
          .index)
 
     output = output.iloc[idx]
-    output.to_json(params['output_location']+'output_6_months.json', orient='records', lines=True)
+    return output
+
+
+def main():
+    params = get_params()
+    customers , products = read_csv(params['customers_location'],params['products_location'])
+    transaction = transactions(params['transactions_location'])
+    output = return_output(customers, products, transaction)
+    output = sort_output(output)
+    output.to_json(params['output_location'] + 'output.json', orient='records')
+    return output
+
 
 
 
