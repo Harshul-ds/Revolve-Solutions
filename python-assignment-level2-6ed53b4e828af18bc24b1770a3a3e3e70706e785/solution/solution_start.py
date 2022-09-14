@@ -6,9 +6,9 @@ import glob
 
 def get_params() -> dict:
     parser = argparse.ArgumentParser(description='DataTest')
-    parser.add_argument('--customers_location', required=False, default="./input_data/starter/customers.csv")
-    parser.add_argument('--products_location', required=False, default="./input_data/starter/products.csv")
-    parser.add_argument('--transactions_location', required=False, default= r'.\input_data\starter\transactions/*')
+    parser.add_argument('--customers_location', required=False, default="../input_data/starter/customers.csv")
+    parser.add_argument('--products_location', required=False, default="../input_data/starter/products.csv")
+    parser.add_argument('--transactions_location', required=False, default= r'..\input_data\starter\transactions/*')
     parser.add_argument('--output_location', required=False, default="./output_data/outputs/")
     return vars(parser.parse_args())
 
@@ -30,6 +30,8 @@ def read_csv(customers_location, products_location) -> pd.DataFrame:
     return customers, products
 
 def return_output(customers, products, transactions):
+    if not isinstance(customers, pd.DataFrame) or not isinstance(products, pd.DataFrame) or not isinstance(transactions, pd.DataFrame):
+        raise Exception("Input data is not a pandas DataFrame")
     transactions = transactions.groupby(['customer_id','date_of_purchase']).sum().reset_index()
     transactions['purchase_count'] = transactions['basket'].apply(lambda x: len(x))
     transactions = transactions.explode('basket').reset_index(drop=True)
@@ -42,14 +44,27 @@ def return_output(customers, products, transactions):
     transactions = transactions.rename(columns={'date_of_purchase':'purchase_count'})
     transactions = transactions[['customer_id','loyalty_score','product_id','product_category','purchase_count']]
     return transactions
-    
+
+
+def sort_output(output):
+    # sort output by customer_id
+    idx = (output.assign(customer_id=output.customer_id.str.extract(r'(\d+)$').astype(int))
+         .sort_values(['customer_id'])
+         .index)
+
+    output = output.iloc[idx]
+    return output
+
 
 def main():
     params = get_params()
     customers , products = read_csv(params['customers_location'],params['products_location'])
     transaction = transactions(params['transactions_location'])
     output = return_output(customers, products, transaction)
-    output.to_json(params['output_location']+'output_10_Days.json', orient='records', lines=True)
+    output = sort_output(output)
+    output.to_json(params['output_location'] + 'output.json', orient='records')
+    return output
+
 
 
 
