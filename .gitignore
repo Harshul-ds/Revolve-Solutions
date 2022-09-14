@@ -1,3 +1,5 @@
-.vscode
-./python-assignment-level2-6ed53b4e828af18bc24b1770a3a3e3e70706e785/inputs_data_generator/__pycache__
-./python-assignment-level2-6ed53b4e828af18bc24b1770a3a3e3e70706e785/solution/__pycache__
+*.vscode
+*.pyo
+*.pyc
+*.pyd
+*.cache
