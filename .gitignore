@@ -1,5 +1,2 @@
-*.vscode
-*.pyo
-*.pyc
-*.pyd
-*.cache
+**/__pycache__/
+.vscode/
